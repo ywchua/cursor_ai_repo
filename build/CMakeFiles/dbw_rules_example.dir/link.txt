@@ -1,0 +1,1 @@
+/usr/bin/c++ -Xlinker --dependency-file=CMakeFiles/dbw_rules_example.dir/link.d CMakeFiles/dbw_rules_example.dir/tools/example_main.cpp.o -o dbw_rules_example  libdbw_rules.a

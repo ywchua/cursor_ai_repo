@@ -1,0 +1,2 @@
+/usr/bin/ar qc libdbw_rules.a CMakeFiles/dbw_rules.dir/src/dbw/RuleEngine.cpp.o
+/usr/bin/ranlib libdbw_rules.a

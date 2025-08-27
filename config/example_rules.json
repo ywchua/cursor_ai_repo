@@ -1,0 +1,38 @@
+{
+  "rules": [
+    {
+      "name": "enter_auto_mode",
+      "trigger": { "on_event": "dbw_toggle_on" },
+      "conditions": [
+        { "signal": "gear", "equals": "P" },
+        { "signal": "VCU_Life_Signal", "greater_than": 0 }
+      ],
+      "sequence": [
+        { "set": { "AS_HandShank_Ctrl_St": 0 } },
+        { "set": { "AS_Strg0_Enable": 3 } },
+        { "set": { "AS_Strg1_Enable": 3 } },
+        { "set": { "AS_Strg_WorkMode_Req": 1 } },
+        { "set": { "AS_AutoD_Shift_Req": 2 } },
+        { "set": { "AS_Longit_Ctrlmode": 1 } },
+        { "set": { "AS_AutoD_BrkMode_Req": 3 } },
+        { "set": { "AS_AutoD_Accel_Pos_Req": 0.0 } },
+        { "set": { "AS_AutoD_BrkPelPos_Req": 0.3 } },
+        { "set": { "AS_AutoD_Spd_Limit": 5.0 } },
+        { "wait_ms": 200 },
+        { "set": { "AS_AutoD_Req": 1 } }
+      ]
+    },
+    {
+      "name": "exit_auto_mode",
+      "trigger": { "on_event": "dbw_toggle_off" },
+      "sequence": [
+        { "set": { "AS_AutoD_Req": 0 } },
+        { "wait_ms": 250 },
+        { "set": { "AS_Strg_WorkMode_Req": 4 } },
+        { "set": { "AS_Strg0_Enable": 0 } },
+        { "set": { "AS_Strg1_Enable": 0 } }
+      ]
+    }
+  ]
+}
+

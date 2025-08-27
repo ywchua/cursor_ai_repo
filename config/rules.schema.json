@@ -1,0 +1,87 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.com/dbw.rules.schema.json",
+  "title": "Drive-By-Wire Rule Set",
+  "type": "object",
+  "properties": {
+    "rules": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/rule" },
+      "minItems": 1
+    }
+  },
+  "required": ["rules"],
+  "additionalProperties": false,
+  "definitions": {
+    "value": {
+      "oneOf": [
+        { "type": "number" },
+        { "type": "boolean" },
+        { "type": "string" }
+      ]
+    },
+    "condition": {
+      "type": "object",
+      "properties": {
+        "signal": { "type": "string", "minLength": 1 },
+        "equals": { "$ref": "#/definitions/value" },
+        "not_equals": { "$ref": "#/definitions/value" },
+        "greater_than": { "type": "number" },
+        "less_than": { "type": "number" },
+        "greater_or_equal": { "type": "number" },
+        "less_or_equal": { "type": "number" }
+      },
+      "required": ["signal"],
+      "additionalProperties": false,
+      "minProperties": 2
+    },
+    "step": {
+      "type": "object",
+      "oneOf": [
+        {
+          "properties": {
+            "set": {
+              "type": "object",
+              "minProperties": 1,
+              "maxProperties": 1,
+              "additionalProperties": { "$ref": "#/definitions/value" }
+            }
+          },
+          "required": ["set"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "wait_ms": { "type": "integer", "minimum": 0 }
+          },
+          "required": ["wait_ms"],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "rule": {
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "trigger": {
+          "type": "object",
+          "properties": { "on_event": { "type": "string", "minLength": 1 } },
+          "required": ["on_event"],
+          "additionalProperties": false
+        },
+        "conditions": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/condition" }
+        },
+        "sequence": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/step" },
+          "minItems": 1
+        }
+      },
+      "required": ["name", "trigger", "sequence"],
+      "additionalProperties": false
+    }
+  }
+}
+
