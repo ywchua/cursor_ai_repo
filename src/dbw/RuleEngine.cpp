@@ -215,8 +215,8 @@ static bool parseRule(const nlohmann::json &j, Rule &out, std::string &err) {
 		if (sj.contains("set")) {
 			const auto &setj = sj.at("set");
 			if (setj.size() != 1) { err = "set step must have exactly one key"; return false; }
-			const auto &kv = *setj.begin();
-			StepSet s{ kv.key(), parseValue(kv.value()) };
+			auto it = setj.begin();
+			StepSet s{ it.key(), parseValue(it.value()) };
 			out.sequence.emplace_back(std::move(s));
 		} else if (sj.contains("wait_ms")) {
 			StepWait w{ Milli(sj.at("wait_ms").get<int>()) };
