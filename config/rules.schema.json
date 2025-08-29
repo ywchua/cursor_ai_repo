@@ -23,7 +23,7 @@
     "condition": {
       "type": "object",
       "properties": {
-        "signal": { "type": "string", "minLength": 1 },
+        "signal": { "type": "string", "minLength": 1, "description": "Signal name. Use 'state.<key>' to reference internal rule engine state." },
         "equals": { "$ref": "#/definitions/value" },
         "not_equals": { "$ref": "#/definitions/value" },
         "greater_than": { "type": "number" },
@@ -55,6 +55,25 @@
             "wait_ms": { "type": "integer", "minimum": 0 }
           },
           "required": ["wait_ms"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "set_state": {
+              "type": "object",
+              "minProperties": 1,
+              "maxProperties": 1,
+              "additionalProperties": { "$ref": "#/definitions/value" }
+            }
+          },
+          "required": ["set_state"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "emit_event": { "type": "string", "minLength": 1 }
+          },
+          "required": ["emit_event"],
           "additionalProperties": false
         }
       ]

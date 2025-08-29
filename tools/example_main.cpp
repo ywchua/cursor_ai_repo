@@ -48,7 +48,10 @@ int main(int argc, char **argv) {
 	#if defined(DBW_USE_NLOHMANN_JSON)
 	if (argc > 1) {
 		loaded = engine.loadRulesFromFile(argv[1], error);
-		if (!loaded) std::cerr << "Failed to load rules: " << error << "\n";
+		if (!loaded)
+			std::cerr << "Failed to load rules: " << error << "\n";
+		else
+			std::cout << "Rules loaded successfully from " << argv[1] << "\n";
 	}
 	#endif
 	if (!loaded) {

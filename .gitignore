@@ -1,0 +1,63 @@
+# Add any directories, files, or patterns you don't want to be tracked by version control
+# ignored folders #
+###################
+devel/
+build/
+install/
+log/
+.tmp_versions/
+.catkin_tools/
+CMakeFiles/
+bin/
+
+# compiled source #
+###################
+*.o
+*.o.*
+*.pyc
+
+# c extensions #
+################
+*.so.*
+*.so
+*.a
+
+# kernel modules #
+##################
+modules.order
+Module.symvers
+*.mod.c
+*.ko
+*.ko.*
+.cache*
+
+# incremental compilation marker #
+##################################
+.last_compiled
+
+# blob #
+########
+*.pcd
+
+# catkin #
+##########
+CMakeCache.txt
+
+# swap files #
+##############
+*.swp
+
+# Logs and databases #
+######################
+*.log
+*.sql
+*.sqlite
+*.csv
+
+# user files
+############
+*CMakeLists.txt.user
+
+# Visual Studio files
+#####################
+.vscode
