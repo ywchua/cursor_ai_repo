@@ -1,0 +1,14 @@
+ids:
+  speed_feedback: 0x100
+  rpm_feedback: 0x101
+  soc_feedback: 0x102
+  target_speed_command: 0x200
+  enable_command: 0x201
+periods_ms:
+  tx_feedback: 100
+initial_state:
+  speed_kph: 0.0
+  target_speed_kph: 0.0
+  rpm: 0
+  soc_percent: 90
+  enabled: false
