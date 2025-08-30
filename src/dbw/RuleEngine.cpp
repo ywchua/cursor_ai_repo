@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: MIT
+#include <spdlog/spdlog.h>
 #include "dbw/RuleEngine.hpp"
 
 #include <cmath>
@@ -19,6 +20,7 @@ void RuleEngine::setRules(std::vector<Rule> rules) {
 }
 
 void RuleEngine::onEvent(std::string_view eventName) {
+	spdlog::debug("onEvent: {}", eventName);
 	eventQueue_.emplace_back(eventName);
 }
 
@@ -29,6 +31,7 @@ void RuleEngine::tick(const SignalProvider &signals, CommandBuffer &out) {
 void RuleEngine::tickAt(const SignalProvider &signals, CommandBuffer &out, SteadyClock::time_point now) {
 	if (!active_.has_value() && !eventQueue_.empty()) {
 		const std::string event = eventQueue_.front();
+		spdlog::trace("dequeue event: {}", event);
 		eventQueue_.pop_front();
 		for (const Rule &r : rules_) {
 			if (r.trigger == event && conditionsSatisfied(r, signals)) {
@@ -41,6 +44,7 @@ void RuleEngine::tickAt(const SignalProvider &signals, CommandBuffer &out, Stead
 	if (!active_.has_value()) return;
 
 	if (!conditionsSatisfied(*active_->rule, signals)) {
+		spdlog::warn("rule '{}' cancelled: conditions failed", active_->rule->name);
 		active_.reset();
 		return;
 	}
@@ -51,13 +55,24 @@ void RuleEngine::tickAt(const SignalProvider &signals, CommandBuffer &out, Stead
 	}
 
 	const Step &step = active_->rule->sequence[active_->stepIndex];
+	spdlog::trace("rule '{}' step {}", active_->rule->name, active_->stepIndex);
 
 	if (std::holds_alternative<StepSet>(step)) {
 		const StepSet &s = std::get<StepSet>(step);
+		spdlog::debug("set {}", s.key);
 		out.set(s.key, s.value);
 		advanceStep(now);
 		return;
 	}
+
+	if (std::holds_alternative<StepSetAll>(step)) {
+		const StepSetAll &sa = std::get<StepSetAll>(step);
+		for (const auto &kv : sa.kvs) {
+		  out.set(kv.first, kv.second);
+		}
+		advanceStep(now);
+		return;
+	  }
 
 	if (std::holds_alternative<StepSetState>(step)) {
 		const StepSetState &s = std::get<StepSetState>(step);
@@ -236,6 +251,13 @@ static bool parseRule(const nlohmann::json &j, Rule &out, std::string &err) {
 			auto it = setj.begin();
 			StepSetState s{ it.key(), parseValue(it.value()) };
 			out.sequence.emplace_back(std::move(s));
+		} else if (sj.contains("set_all")) {
+			const auto &obj = sj.at("set_all");
+			StepSetAll sa;
+			for (auto it = obj.begin(); it != obj.end(); ++it) {
+			  sa.kvs.emplace_back(it.key(), parseValue(it.value()));
+			}
+			out.sequence.emplace_back(std::move(sa));
 		} else if (sj.contains("emit_event")) {
 			StepEmitEvent e{ sj.at("emit_event").get<std::string>() };
 			out.sequence.emplace_back(std::move(e));
@@ -269,7 +291,11 @@ bool RuleEngine::loadRulesFromJsonString(const std::string &jsonText, std::strin
 	std::vector<Rule> parsed;
 	for (const auto &rj : j.at("rules")) {
 		Rule r;
-		if (!parseRule(rj, r, errorMessage)) return false;
+		if (!parseRule(rj, r, errorMessage)) {
+			spdlog::error("rule parse failed: {}", errorMessage);
+			return false;
+		}
+		spdlog::info("rule loaded: {}", r.name);
 		parsed.push_back(std::move(r));
 	}
 	setRules(std::move(parsed));

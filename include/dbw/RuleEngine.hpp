@@ -75,7 +75,8 @@ struct StepSet { std::string key; Value value; };
 struct StepWait { Milli duration {0}; };
 struct StepSetState { std::string key; Value value; };
 struct StepEmitEvent { std::string name; };
-using Step = std::variant<StepSet, StepWait, StepSetState, StepEmitEvent>;
+struct StepSetAll { std::vector<std::pair<std::string, Value>> kvs; };
+using Step = std::variant<StepSet, StepWait, StepSetState, StepEmitEvent, StepSetAll>;
 
 struct Rule {
 	std::string name;

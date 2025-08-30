@@ -59,6 +59,17 @@
         },
         {
           "properties": {
+            "set_all": {
+              "type": "object",
+              "minProperties": 1,
+              "additionalProperties": { "$ref": "#/definitions/value" }
+            }
+          },
+          "required": ["set_all"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
             "set_state": {
               "type": "object",
               "minProperties": 1,
