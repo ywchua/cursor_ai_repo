@@ -6,6 +6,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 option(DBW_USE_NLOHMANN_JSON "Enable JSON loader using nlohmann/json" ON)
+option(DBW_USE_SPDLOG "Enable Logging using spdlog" ON)
 
 add_library(dbw_rules STATIC
     src/dbw/RuleEngine.cpp
@@ -25,6 +26,22 @@ if(DBW_USE_NLOHMANN_JSON)
     else()
         message(STATUS "dbw_rules: nlohmann_json not found; JSON loader disabled")
     endif()
+endif()
+
+if (USE_SPDLOG)
+  find_package(spdlog 1.8 QUIET)
+  if (spdlog_FOUND)
+    target_link_libraries(dbw_rules PUBLIC spdlog::spdlog)
+    target_link_libraries(dbw_rules_example PRIVATE spdlog::spdlog)
+    target_compile_definitions(dbw_rules PUBLIC HAVE_SPDLOG=1)
+    # Enable TRACE in Debug builds
+    if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+      target_compile_definitions(dbw_rules PUBLIC SPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_TRACE)
+    endif()
+    message(STATUS "spdlog enabled")
+  else()
+    message(STATUS "spdlog not found; logging disabled")
+  endif()
 endif()
 
 add_executable(dbw_rules_example

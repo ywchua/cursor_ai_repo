@@ -1,4 +1,6 @@
 // SPDX-License-Identifier: MIT
+#include <spdlog/spdlog.h>
+#include <spdlog/sinks/stdout_color_sinks.h>
 #include "dbw/RuleEngine.hpp"
 
 #include <iostream>
@@ -42,6 +44,11 @@ static void printCommands(const CommandBuffer &buf) {
 }
 
 int main(int argc, char **argv) {
+	auto logger = spdlog::stdout_color_mt("dbw");
+	spdlog::set_default_logger(logger);
+	spdlog::set_level(spdlog::level::debug); // or trace in Debug
+	spdlog::set_pattern("%H:%M:%S.%e [%^%l%$] %n: %v");
+
 	RuleEngine engine;
 	std::string error;
 	bool loaded = false;
@@ -93,6 +100,7 @@ int main(int argc, char **argv) {
 		if (!out.commands().empty()) {
 			printCommands(out);
 		}
+		std::cout << "--------------------------\n";
 		std::this_thread::sleep_for(std::chrono::milliseconds(50));
 	}
 	return 0;
